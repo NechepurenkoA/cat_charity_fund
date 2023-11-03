@@ -24,10 +24,12 @@
     ```bash
    pip install -r requirements.txt
    ```
+4. Обязательно заполните файл `.env` по предоставленному примеру `.env.example`! 
 3. Запустить проект с помощью `uvicorn`
     ```bash
    uvicorn app.main:app --reload --port 1111 # аргумент порт можете использовать по желанию
     ```
+
    
 _Использованные технологии и доп. библиотеки: [FastAPI](https://fastapi.tiangolo.com/), [Pydantic](https://docs.pydantic.dev/latest/),
 [SQLAlchemy](https://www.sqlalchemy.org/?ref=), Python 3.9_
