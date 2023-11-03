@@ -6,6 +6,9 @@ from app.models import Donation, CharityProject
 from app.core.db import AsyncSession
 
 
+QUERY_PARAM = False
+
+
 async def close_dono_or_proj(
         to_close: Donation or CharityProject
 ) -> None:
@@ -50,10 +53,10 @@ async def add_dono_to_proj(
 async def invest(session: AsyncSession) -> None:
     """Main фун-ия инвестирования"""
     projects_query = await session.scalars(
-        select(CharityProject).where(CharityProject.fully_invested == False)
+        select(CharityProject).where(CharityProject.fully_invested == QUERY_PARAM)
     )
     donations_query = await session.scalars(
-        select(Donation).where(Donation.fully_invested == False)
+        select(Donation).where(Donation.fully_invested == QUERY_PARAM)
     )
     uninvested_projs = projects_query.all()
     uninvested_donos = donations_query.all()

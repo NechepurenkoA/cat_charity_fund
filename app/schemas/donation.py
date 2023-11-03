@@ -4,8 +4,6 @@ from typing import Optional
 
 from pydantic import (
     BaseModel,
-    Field,
-    validator,
     PositiveInt,
     Extra
 )
@@ -13,6 +11,9 @@ from pydantic import (
 
 class DonationBase(BaseModel):
     comment: Optional[str]
+
+    class Config:
+        extra = Extra.forbid
 
 
 class DonationCreate(DonationBase):

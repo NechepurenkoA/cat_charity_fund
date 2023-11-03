@@ -1,4 +1,3 @@
-from datetime import datetime as dt
 from http import HTTPStatus
 
 from fastapi import HTTPException
@@ -6,7 +5,6 @@ from fastapi import HTTPException
 from app.models import CharityProject
 from app.core.db import AsyncSession
 from app.crud.charity_project import charity_project_crud
-from app.schemas.charity_project import CharityProjectUpdate
 
 
 async def check_project_name_duplicate(

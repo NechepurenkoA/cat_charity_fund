@@ -1,5 +1,3 @@
-from typing import Optional
-
 from sqlalchemy import select
 
 from app.models import User, Donation
