@@ -9,7 +9,7 @@ from app.core.db import AsyncSession
 QUERY_PARAM = False
 
 
-async def close_dono_or_proj(
+async def close_donation_or_project(
         to_close: Donation or CharityProject
 ) -> None:
     """Фун-ия для закрытия доната или проэкта сбора"""
@@ -18,36 +18,40 @@ async def close_dono_or_proj(
 
 
 async def investment_addition(
-        proj: CharityProject,
-        dono: Donation,
+        project: CharityProject,
+        donation: Donation,
         to_add: int
 ) -> None:
     """Фун-ия 'распределитель'"""
-    proj.invested_amount += to_add
-    dono.invested_amount += to_add
+    project.invested_amount += to_add
+    donation.invested_amount += to_add
 
 
-async def add_dono_to_proj(
-        dono: Donation,
-        proj: CharityProject
+async def add_donation_to_project(
+        donation: Donation,
+        project: CharityProject
 ):
     """Фун-ия для распределения средств"""
-    proj_dif = proj.full_amount - proj.invested_amount  # разность между уже собранными деньгами и целью
-    dono_dif = dono.full_amount - dono.invested_amount  # разность между уже отданными деньгами и оставшимися
+    project_difference: int = (
+        project.full_amount - project.invested_amount
+    )  # разность между целью и собранными деньгами
+    donation_difference: int = (
+        donation.full_amount - donation.invested_amount
+    )  # разность между пожертвованными и уже распределенными деньгами
 
-    if proj_dif >= dono_dif:
-        await investment_addition(proj, dono, dono_dif)
+    if project_difference >= donation_difference:
+        await investment_addition(project, donation, donation_difference)
 
-    if proj_dif < dono_dif:
-        await investment_addition(proj, dono, proj_dif)
+    if project_difference < donation_difference:
+        await investment_addition(project, donation, project_difference)
 
-    if proj.invested_amount == proj.full_amount:
-        await close_dono_or_proj(proj)
+    if project.invested_amount == project.full_amount:
+        await close_donation_or_project(project)
 
-    if dono.invested_amount == dono.full_amount:
-        await close_dono_or_proj(dono)
+    if donation.invested_amount == donation.full_amount:
+        await close_donation_or_project(donation)
 
-    return proj
+    return project
 
 
 async def invest(session: AsyncSession) -> None:
@@ -58,11 +62,11 @@ async def invest(session: AsyncSession) -> None:
     donations_query = await session.scalars(
         select(Donation).where(Donation.fully_invested == QUERY_PARAM)
     )
-    uninvested_projs = projects_query.all()
-    uninvested_donos = donations_query.all()
-    for proj in uninvested_projs:
-        for dono in uninvested_donos:
-            proj = await add_dono_to_proj(dono, proj)
+    uninvested_projects = projects_query.all()
+    uninvested_donations = donations_query.all()
+    for proj in uninvested_projects:
+        for dono in uninvested_donations:
+            proj = await add_donation_to_project(dono, proj)
             if proj.invested_amount == proj.full_amount:
                 break
     await session.commit()
